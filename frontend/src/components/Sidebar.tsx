@@ -10,6 +10,8 @@ interface SidebarProps {
   selectedEntity: Entity | null;
   isAdding: boolean;
   setIsAdding: (adding: boolean) => void;
+  isEditing: boolean;
+  setIsEditing: (editing: boolean) => void;
   tempLocation: { lat: number; lng: number } | null;
   search: string;
   setSearch: (s: string) => void;
@@ -20,13 +22,12 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
-  entities, onSelect, selectedEntity, isAdding, setIsAdding, tempLocation,
+  entities, onSelect, selectedEntity, isAdding, setIsAdding, isEditing, setIsEditing, tempLocation,
   search, setSearch, typeFilter, setTypeFilter, statusFilter, setStatusFilter
 }) => {
   const createMutation = useCreateEntity();
   const updateMutation = useUpdateEntity();
   const deleteMutation = useDeleteEntity();
-  const [isEditing, setIsEditing] = useState(false);
 
   const handleAddSubmit = (data: EntityPayload) => {
     createMutation.mutate(data, {

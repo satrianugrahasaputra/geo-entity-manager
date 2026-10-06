@@ -27,14 +27,18 @@ const AppContent: React.FC = () => {
   });
   const [selectedEntity, setSelectedEntity] = useState<Entity | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [tempLocation, setTempLocation] = useState<{lat: number; lng: number} | null>(null);
 
   const entities = data?.data || [];
+  const isInteractive = isAdding || isEditing;
 
-  // Reset temp location when adding is cancelled
+  // Reset temp location when not adding or editing
   React.useEffect(() => {
-    if (!isAdding) setTempLocation(null);
-  }, [isAdding]);
+    if (!isAdding && !isEditing) {
+      setTempLocation(null);
+    }
+  }, [isAdding, isEditing]);
 
   return (
     <div className="w-full h-screen flex overflow-hidden">
@@ -45,7 +49,10 @@ const AppContent: React.FC = () => {
         selectedEntity={selectedEntity} 
         isAdding={isAdding}
         setIsAdding={setIsAdding}
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
         tempLocation={tempLocation}
+        setTempLocation={setTempLocation}
         search={search}
         setSearch={setSearch}
         typeFilter={typeFilter}
@@ -59,7 +66,7 @@ const AppContent: React.FC = () => {
         <div className="absolute inset-0 z-0">
           <Map 
             entities={entities} 
-            isAdding={isAdding}
+            isInteractive={isInteractive}
             tempLocation={tempLocation}
             onLocationSelect={setTempLocation}
           />

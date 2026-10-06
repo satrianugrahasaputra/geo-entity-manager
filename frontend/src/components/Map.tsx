@@ -25,15 +25,15 @@ const TempIcon = L.icon({
 
 interface MapProps {
   entities: Entity[];
-  isAdding?: boolean;
+  isInteractive?: boolean;
   tempLocation?: { lat: number; lng: number } | null;
   onLocationSelect?: (latlng: { lat: number; lng: number }) => void;
 }
 
-const MapEvents: React.FC<{ isAdding?: boolean; onLocationSelect?: (latlng: { lat: number; lng: number }) => void }> = ({ isAdding, onLocationSelect }) => {
+const MapEvents: React.FC<{ isInteractive?: boolean; onLocationSelect?: (latlng: { lat: number; lng: number }) => void }> = ({ isInteractive, onLocationSelect }) => {
   useMapEvents({
     click(e) {
-      if (isAdding && onLocationSelect) {
+      if (isInteractive && onLocationSelect) {
         onLocationSelect({ lat: e.latlng.lat, lng: e.latlng.lng });
       }
     }
@@ -41,19 +41,19 @@ const MapEvents: React.FC<{ isAdding?: boolean; onLocationSelect?: (latlng: { la
   return null;
 };
 
-const Map: React.FC<MapProps> = ({ entities, isAdding, tempLocation, onLocationSelect }) => {
+const Map: React.FC<MapProps> = ({ entities, isInteractive, tempLocation, onLocationSelect }) => {
   return (
     <MapContainer 
       center={[-6.200000, 106.816666]} // Default center to Jakarta
       zoom={11} 
-      className={`w-full h-full z-0 ${isAdding ? 'cursor-crosshair' : ''}`}
+      className={`w-full h-full z-0 ${isInteractive ? 'cursor-crosshair' : ''}`}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      <MapEvents isAdding={isAdding} onLocationSelect={onLocationSelect} />
+      <MapEvents isInteractive={isInteractive} onLocationSelect={onLocationSelect} />
 
       {entities.map((entity) => (
         <Marker 
@@ -76,9 +76,23 @@ const Map: React.FC<MapProps> = ({ entities, isAdding, tempLocation, onLocationS
         </Marker>
       ))}
 
-      {isAdding && tempLocation && (
-        <Marker position={[tempLocation.lat, tempLocation.lng]} icon={TempIcon} opacity={0.7}>
-          <Popup>Lokasi yang dipilih</Popup>
+      {isInteractive && tempLocation && (
+        <Marker 
+          position={[tempLocation.lat, tempLocation.lng]} 
+          icon={TempIcon} 
+          opacity={0.9}
+          draggable={true}
+          eventHandlers={{
+            dragend: (e) => {
+              const marker = e.target;
+              const position = marker.getLatLng();
+              if (onLocationSelect) {
+                onLocationSelect({ lat: position.lat, lng: position.lng });
+              }
+            }
+          }}
+        >
+          <Popup>Lokasi (Geser marker atau klik peta)</Popup>
         </Marker>
       )}
     </MapContainer>
