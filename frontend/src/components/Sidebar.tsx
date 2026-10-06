@@ -65,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     const errorMsg = isEdit ? updateMutation.error : createMutation.error;
 
     return (
-      <div className="w-80 h-full bg-white border-r border-gray-200 flex flex-col z-20 shadow-lg">
+      <aside className="w-full md:w-80 h-1/2 md:h-full bg-white border-b md:border-r md:border-b-0 border-gray-200 flex flex-col z-20 shadow-lg" aria-label="Form Entitas">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-50">
           <h2 className="font-bold text-blue-800">{isEdit ? 'Edit Entitas' : 'Tambah Entitas Baru'}</h2>
           <button onClick={() => { setIsAdding(false); setIsEditing(false); }} className="text-gray-500 hover:text-gray-700">
@@ -89,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }
 
   return (
-    <div className="w-80 h-full bg-white border-r border-gray-200 flex flex-col z-20 shadow-lg">
+    <aside className="w-full md:w-80 h-1/2 md:h-full bg-white border-b md:border-r md:border-b-0 border-gray-200 flex flex-col z-20 shadow-lg" aria-label="Sidebar Entitas">
       <div className="p-4 border-b border-gray-200 flex justify-between items-start">
         <div>
           <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">

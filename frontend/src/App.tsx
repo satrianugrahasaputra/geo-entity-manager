@@ -33,6 +33,13 @@ const AppContent: React.FC = () => {
   const entities = data?.data || [];
   const isInteractive = isAdding || isEditing;
 
+  // Init tempLocation for edit mode
+  React.useEffect(() => {
+    if (isEditing && selectedEntity) {
+      setTempLocation({ lat: selectedEntity.latitude, lng: selectedEntity.longitude });
+    }
+  }, [isEditing, selectedEntity]);
+
   // Reset temp location when not adding or editing
   React.useEffect(() => {
     if (!isAdding && !isEditing) {
@@ -41,7 +48,7 @@ const AppContent: React.FC = () => {
   }, [isAdding, isEditing]);
 
   return (
-    <div className="w-full h-screen flex overflow-hidden">
+    <div className="w-full h-screen flex flex-col md:flex-row overflow-hidden">
       {/* Left Sidebar */}
       <Sidebar 
         entities={entities} 

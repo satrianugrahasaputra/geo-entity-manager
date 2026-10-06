@@ -46,7 +46,7 @@ _Akan diisi secara jujur di akhir pengerjaan: tool yang dipakai, bagian yang dib
 | S14 | Edit + hapus | ✅ |
 | S15 | Filter & pencarian | ✅ |
 | S16 | Drag marker | ✅ |
-| S17 | Docker frontend, responsif, aksesibilitas | ⏳ |
+| S17 | Docker frontend, responsif, aksesibilitas | ✅ |
 | S18 | Dokumentasi akhir & verifikasi *fresh clone* | ⏳ |
 
 ## Fitur Belum Selesai & Batasan yang Diketahui
