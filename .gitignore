@@ -1,0 +1,28 @@
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Backend (Go)
+backend/bin/
+backend/tmp/
+*.exe
+*.test
+*.out
+coverage.*
+
+# Frontend (Node)
+node_modules/
+frontend/dist/
+frontend/coverage/
+*.log
+npm-debug.log*
+*.tsbuildinfo
