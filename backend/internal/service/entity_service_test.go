@@ -30,6 +30,14 @@ func (r *fakeRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.Enti
 	return nil, nil
 }
 
+func (r *fakeRepository) List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, limit, offset int) ([]model.Entity, error) {
+	return []model.Entity{}, nil
+}
+
+func (r *fakeRepository) Count(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string) (int64, error) {
+	return 0, nil
+}
+
 func TestCreate(t *testing.T) {
 	fakeRepo := &fakeRepository{}
 	svc := NewEntityService(fakeRepo)

@@ -37,6 +37,7 @@ func NewRouter(cfg RouterConfig) *gin.Engine {
 	
 	if cfg.EntityHandler != nil {
 		api.POST("/entities", cfg.EntityHandler.Create)
+		api.GET("/entities", cfg.EntityHandler.List)
 		api.GET("/entities/:id", cfg.EntityHandler.GetByID)
 	}
 

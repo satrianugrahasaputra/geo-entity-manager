@@ -77,3 +77,88 @@ func (r *EntityRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.En
 
 	return e, nil
 }
+
+// buildListQuery constructs the WHERE clause and arguments.
+func buildListQuery(typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string) (string, []interface{}) {
+	var conditions []string
+	var args []interface{}
+	argID := 1
+
+	if typeFilter != nil && *typeFilter != "" {
+		conditions = append(conditions, fmt.Sprintf("type = $%d", argID))
+		args = append(args, *typeFilter)
+		argID++
+	}
+	if statusFilter != nil && *statusFilter != "" {
+		conditions = append(conditions, fmt.Sprintf("status = $%d", argID))
+		args = append(args, *statusFilter)
+		argID++
+	}
+	if search != nil && *search != "" {
+		conditions = append(conditions, fmt.Sprintf("name ILIKE $%d", argID))
+		args = append(args, "%"+*search+"%")
+		argID++
+	}
+
+	where := ""
+	if len(conditions) > 0 {
+		where = "WHERE " + conditions[0]
+		for i := 1; i < len(conditions); i++ {
+			where += " AND " + conditions[i]
+		}
+	}
+	return where, args
+}
+
+// Count returns the total number of matching entities.
+func (r *EntityRepository) Count(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string) (int64, error) {
+	where, args := buildListQuery(typeFilter, statusFilter, search)
+	query := "SELECT COUNT(*) FROM entities " + where
+
+	var count int64
+	err := r.pool.QueryRow(ctx, query, args...).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count entities: %w", err)
+	}
+	return count, nil
+}
+
+// List returns a paginated list of matching entities.
+func (r *EntityRepository) List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, limit, offset int) ([]model.Entity, error) {
+	where, args := buildListQuery(typeFilter, statusFilter, search)
+	argID := len(args) + 1
+	
+	query := fmt.Sprintf(`
+		SELECT id, name, type, status, description, latitude, longitude, created_at, updated_at
+		FROM entities
+		%s
+		ORDER BY created_at DESC
+		LIMIT $%d OFFSET $%d
+	`, where, argID, argID+1)
+	
+	args = append(args, limit, offset)
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("query entities: %w", err)
+	}
+	defer rows.Close()
+
+	var results []model.Entity
+	for rows.Next() {
+		var e model.Entity
+		if err := rows.Scan(
+			&e.ID, &e.Name, &e.Type, &e.Status, &e.Description,
+			&e.Latitude, &e.Longitude, &e.CreatedAt, &e.UpdatedAt,
+		); err != nil {
+			return nil, fmt.Errorf("scan entity: %w", err)
+		}
+		results = append(results, e)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
+	return results, nil
+}
+

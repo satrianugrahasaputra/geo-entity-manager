@@ -37,6 +37,15 @@ type PatchEntityRequest struct {
 	Longitude   *float64            `json:"longitude,omitempty" validate:"omitempty,finite,min=-180,max=180"`
 }
 
+// ListEntityQuery represents query parameters for GET /entities.
+type ListEntityQuery struct {
+	Type   *model.EntityType   `form:"type" validate:"omitempty,oneof=vehicle iot_device facility other"`
+	Status *model.EntityStatus `form:"status" validate:"omitempty,oneof=active inactive maintenance offline"`
+	Search *string             `form:"search" validate:"omitempty,max=100"`
+	Page   *int                `form:"page" validate:"omitempty,min=1"`
+	Limit  *int                `form:"limit" validate:"omitempty,min=1,max=5000"`
+}
+
 // EntityResponse represents an entity sent to the client.
 type EntityResponse struct {
 	ID          uuid.UUID          `json:"id"`

@@ -63,3 +63,27 @@ func DecodeAndValidate(r *http.Request, v interface{}) error {
 	// Run domain rules via struct tags
 	return validation.Struct(v)
 }
+
+// DecodeQueryAndValidate parses URL query parameters and runs validation.
+func DecodeQueryAndValidate(r *http.Request, v interface{}) error {
+	// For strict query validation, we could check for unknown params here.
+	// But using a simple generic form binder from gorilla/schema or similar is often easier.
+	// Since we don't have it, we'll manually check unknown keys if needed, 
+	// or let the framework binder do it. Let's do a simple check.
+	allowedKeys := map[string]bool{
+		"type": true, "status": true, "search": true, "page": true, "limit": true,
+	}
+	for key := range r.URL.Query() {
+		if !allowedKeys[key] {
+			return apperror.NewValidationError("Terdapat query param yang tidak dikenal", []apperror.FieldDetail{
+				{Field: key, Message: "query param asing tidak diizinkan"},
+			})
+		}
+	}
+
+	// We let the caller bind (e.g. c.ShouldBindQuery) and just run validation here
+	// because implementing a reflection-based form decoder from scratch is too much.
+	// Actually we should just pass the struct to validation.Struct.
+	return validation.Struct(v)
+}
+

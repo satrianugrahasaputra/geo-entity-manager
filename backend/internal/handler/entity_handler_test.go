@@ -19,6 +19,7 @@ import (
 type fakeEntityService struct {
 	createFunc  func(ctx context.Context, e *model.Entity) error
 	getByIDFunc func(ctx context.Context, id uuid.UUID) (*model.Entity, error)
+	listFunc    func(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, page, limit int) ([]model.Entity, int64, error)
 }
 
 func (s *fakeEntityService) Create(ctx context.Context, e *model.Entity) error {
@@ -34,6 +35,13 @@ func (s *fakeEntityService) GetByID(ctx context.Context, id uuid.UUID) (*model.E
 		return s.getByIDFunc(ctx, id)
 	}
 	return &model.Entity{ID: id, Name: "Test"}, nil
+}
+
+func (s *fakeEntityService) List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, page, limit int) ([]model.Entity, int64, error) {
+	if s.listFunc != nil {
+		return s.listFunc(ctx, typeFilter, statusFilter, search, page, limit)
+	}
+	return nil, 0, nil
 }
 
 func TestCreateEntity(t *testing.T) {
@@ -102,3 +110,36 @@ func TestGetByID(t *testing.T) {
 		assert.Equal(t, CodeNotFound, resp.Error.Code)
 	})
 }
+
+func TestListEntities(t *testing.T) {
+	fakeSvc := &fakeEntityService{}
+	router := NewRouter(RouterConfig{Logger: discardLogger(), EntityHandler: NewEntityHandler(fakeSvc)})
+
+	t.Run("success", func(t *testing.T) {
+		fakeSvc.listFunc = func(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, page int, limit int) ([]model.Entity, int64, error) {
+			return []model.Entity{{ID: uuid.New(), Name: "E1"}}, 1, nil
+		}
+
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/entities?page=1&limit=10", nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+
+		assert.Equal(t, http.StatusOK, rec.Code)
+		var resp ListResponse
+		require.NoError(t, json.NewDecoder(rec.Body).Decode(&resp))
+		assert.Equal(t, int64(1), resp.Meta.Total)
+		assert.Len(t, resp.Data, 1)
+	})
+
+	t.Run("invalid query param", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/entities?unknown=param", nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+
+		// Expecting 422 Unprocessable Entity due to strict query validation
+		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
+		resp := decodeError(t, rec.Body)
+		assert.Equal(t, CodeValidation, resp.Error.Code)
+	})
+}
+
