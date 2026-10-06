@@ -38,6 +38,10 @@ func (r *fakeRepository) Count(ctx context.Context, typeFilter *model.EntityType
 	return 0, nil
 }
 
+func (r *fakeRepository) Update(ctx context.Context, e *model.Entity) error {
+	return nil
+}
+
 func TestCreate(t *testing.T) {
 	fakeRepo := &fakeRepository{}
 	svc := NewEntityService(fakeRepo)

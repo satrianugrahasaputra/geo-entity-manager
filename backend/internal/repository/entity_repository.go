@@ -162,3 +162,25 @@ func (r *EntityRepository) List(ctx context.Context, typeFilter *model.EntityTyp
 	return results, nil
 }
 
+// Update modifies an existing entity.
+func (r *EntityRepository) Update(ctx context.Context, e *model.Entity) error {
+	query := `
+		UPDATE entities
+		SET name = $1, type = $2, status = $3, description = $4, latitude = $5, longitude = $6, updated_at = NOW()
+		WHERE id = $7
+		RETURNING updated_at
+	`
+	err := r.pool.QueryRow(ctx, query,
+		e.Name, e.Type, e.Status, e.Description, e.Latitude, e.Longitude, e.ID,
+	).Scan(&e.UpdatedAt)
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		return apperror.ErrNotFound
+	}
+	if err != nil {
+		return fmt.Errorf("update entity: %w", err)
+	}
+
+	return nil
+}
+

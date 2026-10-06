@@ -10,12 +10,15 @@ import (
 
 	"geo-entity-manager/backend/internal/apperror"
 	"geo-entity-manager/backend/internal/model"
+	"geo-entity-manager/backend/internal/service"
 )
 
 type EntityService interface {
 	Create(ctx context.Context, e *model.Entity) error
 	GetByID(ctx context.Context, id uuid.UUID) (*model.Entity, error)
 	List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, page, limit int) ([]model.Entity, int64, error)
+	Update(ctx context.Context, id uuid.UUID, e *model.Entity) (*model.Entity, error)
+	Patch(ctx context.Context, id uuid.UUID, req service.PatchRequest) (*model.Entity, error)
 }
 
 type EntityHandler struct {
@@ -121,5 +124,71 @@ func (h *EntityHandler) List(c *gin.Context) {
 		},
 	}
 	c.JSON(http.StatusOK, res)
+}
+
+// Update handles PUT /entities/:id
+func (h *EntityHandler) Update(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		abortWithError(c, http.StatusBadRequest, CodeBadRequest, "Format UUID tidak valid", nil)
+		return
+	}
+
+	var req UpdateEntityRequest
+	if err := DecodeAndValidate(c.Request, &req); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	entity := &model.Entity{
+		Name:        req.Name,
+		Type:        req.Type,
+		Status:      req.Status,
+		Description: req.Description,
+		Latitude:    req.Latitude,
+		Longitude:   req.Longitude,
+	}
+
+	updated, err := h.service.Update(c.Request.Context(), id, entity)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, MapEntityToResponse(updated))
+}
+
+// Patch handles PATCH /entities/:id
+func (h *EntityHandler) Patch(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		abortWithError(c, http.StatusBadRequest, CodeBadRequest, "Format UUID tidak valid", nil)
+		return
+	}
+
+	var req PatchEntityRequest
+	if err := DecodeAndValidate(c.Request, &req); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	patchReq := service.PatchRequest{
+		Name:        req.Name,
+		Type:        req.Type,
+		Status:      req.Status,
+		Description: req.Description,
+		Latitude:    req.Latitude,
+		Longitude:   req.Longitude,
+	}
+
+	updated, err := h.service.Patch(c.Request.Context(), id, patchReq)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, MapEntityToResponse(updated))
 }
 

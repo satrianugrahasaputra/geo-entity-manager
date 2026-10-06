@@ -34,7 +34,7 @@ _Akan diisi secara jujur di akhir pengerjaan: tool yang dipakai, bagian yang dib
 | S2 | Database & migrasi | ✅ |
 | S3 | Model, DTO, validasi, format error | ✅ |
 | S4 | Create + Get by ID | ✅ |
-| S5 | List + filter + pencarian + pagination | ⏳ |
+| S5 | List + filter + pencarian + pagination | ✅ |
 | S6 | PUT + PATCH | ⏳ |
 | S7 | DELETE | ⏳ |
 | S8 | Seed data, OpenAPI, Dockerfile backend | ⏳ |

@@ -14,6 +14,7 @@ import (
 
 	"geo-entity-manager/backend/internal/apperror"
 	"geo-entity-manager/backend/internal/model"
+	"geo-entity-manager/backend/internal/service"
 )
 
 type fakeEntityService struct {
@@ -42,6 +43,15 @@ func (s *fakeEntityService) List(ctx context.Context, typeFilter *model.EntityTy
 		return s.listFunc(ctx, typeFilter, statusFilter, search, page, limit)
 	}
 	return nil, 0, nil
+}
+
+func (s *fakeEntityService) Update(ctx context.Context, id uuid.UUID, e *model.Entity) (*model.Entity, error) {
+	e.ID = id
+	return e, nil
+}
+
+func (s *fakeEntityService) Patch(ctx context.Context, id uuid.UUID, req service.PatchRequest) (*model.Entity, error) {
+	return &model.Entity{ID: id, Name: "Patched"}, nil
 }
 
 func TestCreateEntity(t *testing.T) {
