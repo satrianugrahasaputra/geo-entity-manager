@@ -7,7 +7,7 @@ Aplikasi web untuk menampilkan dan mengelola entitas berlokasi geografis (kendar
 
 ## Tech Stack
 - **Frontend:** React 18 + TypeScript (strict) + Vite, react-leaflet (OpenStreetMap), TanStack Query, React Hook Form + Zod, Tailwind CSS, Vitest + Testing Library
-- **Backend:** Go 1.22+, Gin, go-playground/validator, pgx, golang-migrate, `log/slog`
+- **Backend:** Go 1.25+, Gin, go-playground/validator, pgx, golang-migrate, `log/slog`
 - **Database:** PostgreSQL 16
 - **Infra lokal:** Docker Compose
 
