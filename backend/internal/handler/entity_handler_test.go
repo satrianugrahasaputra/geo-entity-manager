@@ -54,6 +54,10 @@ func (s *fakeEntityService) Patch(ctx context.Context, id uuid.UUID, req service
 	return &model.Entity{ID: id, Name: "Patched"}, nil
 }
 
+func (s *fakeEntityService) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+
 func TestCreateEntity(t *testing.T) {
 	fakeSvc := &fakeEntityService{}
 	router := NewRouter(RouterConfig{Logger: discardLogger(), EntityHandler: NewEntityHandler(fakeSvc)})

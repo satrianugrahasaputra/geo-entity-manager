@@ -184,3 +184,16 @@ func (r *EntityRepository) Update(ctx context.Context, e *model.Entity) error {
 	return nil
 }
 
+// Delete removes an entity by ID.
+func (r *EntityRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM entities WHERE id = $1`
+	cmdTag, err := r.pool.Exec(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("delete entity: %w", err)
+	}
+	if cmdTag.RowsAffected() == 0 {
+		return apperror.ErrNotFound
+	}
+	return nil
+}
+

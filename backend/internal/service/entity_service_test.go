@@ -42,6 +42,10 @@ func (r *fakeRepository) Update(ctx context.Context, e *model.Entity) error {
 	return nil
 }
 
+func (r *fakeRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	return nil
+}
+
 func TestCreate(t *testing.T) {
 	fakeRepo := &fakeRepository{}
 	svc := NewEntityService(fakeRepo)

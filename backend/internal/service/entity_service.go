@@ -15,6 +15,7 @@ type EntityRepository interface {
 	List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, limit, offset int) ([]model.Entity, error)
 	Count(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string) (int64, error)
 	Update(ctx context.Context, e *model.Entity) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 // EntityService contains the business logic for entities.
@@ -109,4 +110,9 @@ func (s *EntityService) Patch(ctx context.Context, id uuid.UUID, req PatchReques
 		return nil, err
 	}
 	return existing, nil
+}
+
+// Delete removes an entity.
+func (s *EntityService) Delete(ctx context.Context, id uuid.UUID) error {
+	return s.repo.Delete(ctx, id)
 }

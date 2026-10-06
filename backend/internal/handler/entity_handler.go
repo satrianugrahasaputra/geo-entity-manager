@@ -19,6 +19,7 @@ type EntityService interface {
 	List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, page, limit int) ([]model.Entity, int64, error)
 	Update(ctx context.Context, id uuid.UUID, e *model.Entity) (*model.Entity, error)
 	Patch(ctx context.Context, id uuid.UUID, req service.PatchRequest) (*model.Entity, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type EntityHandler struct {
@@ -190,5 +191,22 @@ func (h *EntityHandler) Patch(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, MapEntityToResponse(updated))
+}
+
+// Delete handles DELETE /entities/:id
+func (h *EntityHandler) Delete(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		abortWithError(c, http.StatusBadRequest, CodeBadRequest, "Format UUID tidak valid", nil)
+		return
+	}
+
+	if err := h.service.Delete(c.Request.Context(), id); err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
 

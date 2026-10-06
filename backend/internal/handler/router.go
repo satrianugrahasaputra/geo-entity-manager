@@ -41,6 +41,7 @@ func NewRouter(cfg RouterConfig) *gin.Engine {
 		api.GET("/entities/:id", cfg.EntityHandler.GetByID)
 		api.PUT("/entities/:id", cfg.EntityHandler.Update)
 		api.PATCH("/entities/:id", cfg.EntityHandler.Patch)
+		api.DELETE("/entities/:id", cfg.EntityHandler.Delete)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
