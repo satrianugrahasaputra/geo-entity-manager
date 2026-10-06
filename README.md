@@ -36,8 +36,8 @@ _Akan diisi secara jujur di akhir pengerjaan: tool yang dipakai, bagian yang dib
 | S4 | Create + Get by ID | ✅ |
 | S5 | List + filter + pencarian + pagination | ✅ |
 | S6 | PUT + PATCH | ✅ |
-| S7 | DELETE | ⏳ |
-| S8 | Seed data, OpenAPI, Dockerfile backend | ⏳ |
+| S7 | DELETE | ✅ |
+| S8 | Seed data, OpenAPI, Dockerfile backend | ✅ |
 | S9 | Kerangka frontend + API client | ⏳ |
 | S10 | Skema Zod | ⏳ |
 | S11 | Peta + marker + state loading/empty/error | ⏳ |

@@ -15,7 +15,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 10s
+  api:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-geo}:${POSTGRES_PASSWORD:-change-me}@db:5432/${POSTGRES_DB:-geo_entities}?sslmode=disable
+      - PORT=8080
+    depends_on:
+      db:
+        condition: service_healthy
 
 volumes:
   geo_pgdata:

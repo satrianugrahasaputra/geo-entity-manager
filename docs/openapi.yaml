@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: Geo Entity Manager API
+  version: 1.0.0
+  description: API for managing geographical entities.
+
+servers:
+  - url: /api/v1
+    description: Current API version
+
+paths:
+  /entities:
+    get:
+      summary: List entities
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5000
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEntityRequest'
+      responses:
+        '201':
+          description: Created
+        '422':
+          description: Unprocessable Entity
+
+  /entities/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get entity by ID
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+    put:
+      summary: Update entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEntityRequest'
+      responses:
+        '200':
+          description: OK
+    patch:
+      summary: Patch entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchEntityRequest'
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Delete entity
+      responses:
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    CreateEntityRequest:
+      type: object
+      required: [name, type, status, latitude, longitude]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        description:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+    UpdateEntityRequest:
+      $ref: '#/components/schemas/CreateEntityRequest'
+    PatchEntityRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        description:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
