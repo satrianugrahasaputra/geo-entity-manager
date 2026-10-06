@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Entity, EntityPayload } from '../types/entity';
 import { MapPin, Info, Edit, Trash2, Plus, X } from 'lucide-react';
 import EntityForm from './EntityForm';
-import { useCreateEntity } from '../hooks/useEntities';
+import { useCreateEntity, useUpdateEntity, useDeleteEntity } from '../hooks/useEntities';
 
 interface SidebarProps {
   entities: Entity[];
@@ -17,6 +17,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   entities, onSelect, selectedEntity, isAdding, setIsAdding, tempLocation 
 }) => {
   const createMutation = useCreateEntity();
+  const updateMutation = useUpdateEntity();
+  const deleteMutation = useDeleteEntity();
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleAddSubmit = (data: EntityPayload) => {
     createMutation.mutate(data, {
@@ -26,24 +29,51 @@ const Sidebar: React.FC<SidebarProps> = ({
     });
   };
 
-  if (isAdding) {
+  const handleEditSubmit = (data: EntityPayload) => {
+    if (!selectedEntity) return;
+    updateMutation.mutate({ id: selectedEntity.id, payload: data }, {
+      onSuccess: (updated) => {
+        setIsEditing(false);
+        onSelect(updated);
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    if (!selectedEntity) return;
+    if (window.confirm(`Apakah Anda yakin ingin menghapus entitas "${selectedEntity.name}"?`)) {
+      deleteMutation.mutate(selectedEntity.id, {
+        onSuccess: () => {
+          onSelect(null);
+        }
+      });
+    }
+  };
+
+  if (isAdding || isEditing) {
+    const isEdit = isEditing && selectedEntity;
+    const isPending = isEdit ? updateMutation.isPending : createMutation.isPending;
+    const isError = isEdit ? updateMutation.isError : createMutation.isError;
+    const errorMsg = isEdit ? updateMutation.error : createMutation.error;
+
     return (
       <div className="w-80 h-full bg-white border-r border-gray-200 flex flex-col z-20 shadow-lg">
         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-50">
-          <h2 className="font-bold text-blue-800">Tambah Entitas Baru</h2>
-          <button onClick={() => setIsAdding(false)} className="text-gray-500 hover:text-gray-700">
+          <h2 className="font-bold text-blue-800">{isEdit ? 'Edit Entitas' : 'Tambah Entitas Baru'}</h2>
+          <button onClick={() => { setIsAdding(false); setIsEditing(false); }} className="text-gray-500 hover:text-gray-700">
             <X size={20} />
           </button>
         </div>
         <EntityForm 
           initialLocation={tempLocation} 
-          onSubmit={handleAddSubmit} 
-          onCancel={() => setIsAdding(false)} 
-          isLoading={createMutation.isPending}
+          entityToEdit={isEdit ? selectedEntity : null}
+          onSubmit={isEdit ? handleEditSubmit : handleAddSubmit} 
+          onCancel={() => { setIsAdding(false); setIsEditing(false); }} 
+          isLoading={isPending}
         />
-        {createMutation.isError && (
+        {isError && (
           <div className="p-2 bg-red-100 text-red-700 text-xs text-center border-t border-red-200">
-            {(createMutation.error as any)?.message || 'Gagal menyimpan entitas'}
+            {(errorMsg as any)?.message || 'Gagal menyimpan entitas'}
           </div>
         )}
       </div>
@@ -116,10 +146,10 @@ const Sidebar: React.FC<SidebarProps> = ({
               <Info size={16} /> Detail
             </h3>
             <div className="flex gap-2">
-              <button className="text-blue-600 hover:text-blue-800" title="Edit">
+              <button onClick={() => setIsEditing(true)} className="text-blue-600 hover:text-blue-800" title="Edit">
                 <Edit size={16} />
               </button>
-              <button className="text-red-600 hover:text-red-800" title="Hapus">
+              <button onClick={handleDelete} className="text-red-600 hover:text-red-800" title="Hapus" disabled={deleteMutation.isPending}>
                 <Trash2 size={16} />
               </button>
             </div>

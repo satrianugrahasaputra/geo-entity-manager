@@ -43,7 +43,7 @@ _Akan diisi secara jujur di akhir pengerjaan: tool yang dipakai, bagian yang dib
 | S11 | Peta + marker + state loading/empty/error | ✅ |
 | S12 | Sidebar daftar + panel detail | ✅ |
 | S13 | Form tambah + pilih lokasi di peta | ✅ |
-| S14 | Edit + hapus | ⏳ |
+| S14 | Edit + hapus | ✅ |
 | S15 | Filter & pencarian | ⏳ |
 | S16 | Drag marker | ⏳ |
 | S17 | Docker frontend, responsif, aksesibilitas | ⏳ |

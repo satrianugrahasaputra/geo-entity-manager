@@ -18,3 +18,23 @@ export const useCreateEntity = () => {
     },
   });
 };
+
+export const useUpdateEntity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: EntityPayload }) => updateEntity(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entities'] });
+    },
+  });
+};
+
+export const useDeleteEntity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteEntity(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['entities'] });
+    },
+  });
+};

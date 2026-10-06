@@ -11,3 +11,12 @@ export const createEntity = async (payload: EntityPayload): Promise<Entity> => {
   const { data } = await client.post<Entity>('/entities', payload);
   return data;
 };
+
+export const updateEntity = async (id: string, payload: EntityPayload): Promise<Entity> => {
+  const { data } = await client.put<Entity>(`/entities/${id}`, payload);
+  return data;
+};
+
+export const deleteEntity = async (id: string): Promise<void> => {
+  await client.delete(`/entities/${id}`);
+};

@@ -3,17 +3,18 @@ import { useForm } from 'react-form'; // Wait, the PRD specified react-hook-form
 import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { entityPayloadSchema } from '../schemas/entity';
-import { EntityPayload } from '../types/entity';
+import { Entity, EntityPayload } from '../types/entity';
 
 interface EntityFormProps {
   initialLocation: { lat: number; lng: number } | null;
+  entityToEdit?: Entity | null;
   onSubmit: (data: EntityPayload) => void;
   onCancel: () => void;
   isLoading: boolean;
 }
 
-const EntityForm: React.FC<EntityFormProps> = ({ initialLocation, onSubmit, onCancel, isLoading }) => {
-  const { register, handleSubmit, setValue, formState: { errors } } = useHookForm<EntityPayload>({
+const EntityForm: React.FC<EntityFormProps> = ({ initialLocation, entityToEdit, onSubmit, onCancel, isLoading }) => {
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useHookForm<EntityPayload>({
     resolver: zodResolver(entityPayloadSchema),
     defaultValues: {
       type: 'vehicle',
@@ -21,6 +22,19 @@ const EntityForm: React.FC<EntityFormProps> = ({ initialLocation, onSubmit, onCa
       description: '',
     }
   });
+
+  useEffect(() => {
+    if (entityToEdit) {
+      reset({
+        name: entityToEdit.name,
+        type: entityToEdit.type,
+        status: entityToEdit.status,
+        description: entityToEdit.description,
+        latitude: entityToEdit.latitude,
+        longitude: entityToEdit.longitude,
+      });
+    }
+  }, [entityToEdit, reset]);
 
   // Automatically update lat/lng when user clicks on map
   useEffect(() => {
