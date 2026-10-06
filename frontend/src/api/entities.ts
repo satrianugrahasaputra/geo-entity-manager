@@ -2,8 +2,14 @@ import client from './client';
 import { ListResponse } from '../types/api';
 import { Entity, EntityPayload } from '../types/entity';
 
-export const getEntities = async (): Promise<ListResponse<Entity>> => {
-  const { data } = await client.get<ListResponse<Entity>>('/entities');
+export interface EntityFilters {
+  type?: string;
+  status?: string;
+  search?: string;
+}
+
+export const getEntities = async (filters?: EntityFilters): Promise<ListResponse<Entity>> => {
+  const { data } = await client.get<ListResponse<Entity>>('/entities', { params: filters });
   return data;
 };
 

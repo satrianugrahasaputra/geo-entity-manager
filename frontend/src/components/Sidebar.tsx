@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Entity, EntityPayload } from '../types/entity';
-import { MapPin, Info, Edit, Trash2, Plus, X } from 'lucide-react';
+import { MapPin, Info, Edit, Trash2, Plus, X, Search, Filter } from 'lucide-react';
 import EntityForm from './EntityForm';
 import { useCreateEntity, useUpdateEntity, useDeleteEntity } from '../hooks/useEntities';
 
@@ -11,10 +11,17 @@ interface SidebarProps {
   isAdding: boolean;
   setIsAdding: (adding: boolean) => void;
   tempLocation: { lat: number; lng: number } | null;
+  search: string;
+  setSearch: (s: string) => void;
+  typeFilter: string;
+  setTypeFilter: (t: string) => void;
+  statusFilter: string;
+  setStatusFilter: (s: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
-  entities, onSelect, selectedEntity, isAdding, setIsAdding, tempLocation 
+  entities, onSelect, selectedEntity, isAdding, setIsAdding, tempLocation,
+  search, setSearch, typeFilter, setTypeFilter, statusFilter, setStatusFilter
 }) => {
   const createMutation = useCreateEntity();
   const updateMutation = useUpdateEntity();
@@ -97,6 +104,46 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Plus size={20} />
         </button>
+      </div>
+
+      <div className="p-3 border-b border-gray-200 bg-gray-50 space-y-2">
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input 
+            type="text" 
+            placeholder="Cari entitas..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Filter size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+            <select 
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full pl-7 pr-2 py-1.5 text-xs border border-gray-300 rounded appearance-none bg-white focus:outline-none focus:border-blue-500"
+            >
+              <option value="">Semua Tipe</option>
+              <option value="vehicle">Vehicle</option>
+              <option value="iot_device">IoT Device</option>
+              <option value="facility">Facility</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="flex-1 px-2 py-1.5 text-xs border border-gray-300 rounded bg-white focus:outline-none focus:border-blue-500"
+          >
+            <option value="">Semua Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="offline">Offline</option>
+          </select>
+        </div>
       </div>
       
       <div className="flex-1 overflow-y-auto p-2">

@@ -9,7 +9,22 @@ import { Entity } from './types/entity';
 const queryClient = new QueryClient();
 
 const AppContent: React.FC = () => {
-  const { data, isLoading, isError, error } = useEntities();
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+
+  // debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  React.useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const { data, isLoading, isError, error } = useEntities({
+    search: debouncedSearch || undefined,
+    type: typeFilter || undefined,
+    status: statusFilter || undefined
+  });
   const [selectedEntity, setSelectedEntity] = useState<Entity | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [tempLocation, setTempLocation] = useState<{lat: number; lng: number} | null>(null);
@@ -31,6 +46,12 @@ const AppContent: React.FC = () => {
         isAdding={isAdding}
         setIsAdding={setIsAdding}
         tempLocation={tempLocation}
+        search={search}
+        setSearch={setSearch}
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
       />
 
       {/* Main Map Area */}
