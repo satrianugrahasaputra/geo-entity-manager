@@ -31,7 +31,7 @@ _Akan diisi secara jujur di akhir pengerjaan: tool yang dipakai, bagian yang dib
 | --- | --- | --- |
 | S0 | Housekeeping repo | ✅ |
 | S1 | Kerangka backend + health check | ✅ |
-| S2 | Database & migrasi | ⏳ |
+| S2 | Database & migrasi | ✅ |
 | S3 | Model, DTO, validasi, format error | ⏳ |
 | S4 | Create + Get by ID | ⏳ |
 | S5 | List + filter + pencarian + pagination | ⏳ |
