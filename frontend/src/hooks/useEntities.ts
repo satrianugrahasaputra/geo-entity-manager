@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getEntities, createEntity, updateEntity, deleteEntity, EntityFilters } from '../api/entities';
-import { EntityPayload } from '../types/entity';
+import { getEntities, createEntity, updateEntity, deleteEntity } from '../api/entities';
+import type { EntityFilters } from '../api/entities';
+import type { EntityPayload } from '../types/entity';
 
 export const useEntities = (filters?: EntityFilters) => {
   return useQuery({

@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { ApiError } from '../types/api';
+import type { ApiError } from '../types/api';
 
 const client = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',

@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
-import { useForm } from 'react-form'; // Wait, the PRD specified react-hook-form
 import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { entityPayloadSchema } from '../schemas/entity';
-import { Entity, EntityPayload } from '../types/entity';
+import type { Entity, EntityPayload } from '../types/entity';
 
 interface EntityFormProps {
   initialLocation: { lat: number; lng: number } | null;

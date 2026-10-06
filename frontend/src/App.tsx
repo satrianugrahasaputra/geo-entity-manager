@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Map from './components/Map';
 import Sidebar from './components/Sidebar';
 import { useEntities } from './hooks/useEntities';
-import { Entity } from './types/entity';
+import type { Entity } from './types/entity';
 
 const queryClient = new QueryClient();
 
@@ -59,7 +59,6 @@ const AppContent: React.FC = () => {
         isEditing={isEditing}
         setIsEditing={setIsEditing}
         tempLocation={tempLocation}
-        setTempLocation={setTempLocation}
         search={search}
         setSearch={setSearch}
         typeFilter={typeFilter}

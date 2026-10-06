@@ -22,12 +22,6 @@ export const entityPayloadSchema = z.object({
   type: entityTypeSchema,
   status: entityStatusSchema,
   description: z.string().max(500, 'Maksimal 500 karakter').optional(),
-  latitude: z.number({
-    required_error: 'Latitude tidak boleh kosong',
-    invalid_type_error: 'Harus berupa angka',
-  }).min(-90, 'Minimal -90').max(90, 'Maksimal 90'),
-  longitude: z.number({
-    required_error: 'Longitude tidak boleh kosong',
-    invalid_type_error: 'Harus berupa angka',
-  }).min(-180, 'Minimal -180').max(180, 'Maksimal 180'),
+  latitude: z.number().min(-90, 'Minimal -90').max(90, 'Maksimal 90'),
+  longitude: z.number().min(-180, 'Minimal -180').max(180, 'Maksimal 180'),
 });

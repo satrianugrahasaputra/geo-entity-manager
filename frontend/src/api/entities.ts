@@ -1,6 +1,6 @@
 import client from './client';
-import { ListResponse } from '../types/api';
-import { Entity, EntityPayload } from '../types/entity';
+import type { ListResponse } from '../types/api';
+import type { Entity, EntityPayload } from '../types/entity';
 
 export interface EntityFilters {
   type?: string;

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Entity, EntityPayload } from '../types/entity';
+import React from 'react';
+import type { Entity, EntityPayload } from '../types/entity';
 import { MapPin, Info, Edit, Trash2, Plus, X, Search, Filter } from 'lucide-react';
 import EntityForm from './EntityForm';
 import { useCreateEntity, useUpdateEntity, useDeleteEntity } from '../hooks/useEntities';
@@ -84,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             {(errorMsg as any)?.message || 'Gagal menyimpan entitas'}
           </div>
         )}
-      </div>
+      </aside>
     );
   }
 
@@ -224,7 +224,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
       )}
-    </div>
+    </aside>
   );
 };
 
