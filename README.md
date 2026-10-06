@@ -41,8 +41,8 @@ _Akan diisi secara jujur di akhir pengerjaan: tool yang dipakai, bagian yang dib
 | S9 | Kerangka frontend + API client | ✅ |
 | S10 | Skema Zod | ✅ |
 | S11 | Peta + marker + state loading/empty/error | ✅ |
-| S12 | Sidebar daftar + panel detail | ⏳ |
-| S13 | Form tambah + pilih lokasi di peta | ⏳ |
+| S12 | Sidebar daftar + panel detail | ✅ |
+| S13 | Form tambah + pilih lokasi di peta | ✅ |
 | S14 | Edit + hapus | ⏳ |
 | S15 | Filter & pencarian | ⏳ |
 | S16 | Drag marker | ⏳ |

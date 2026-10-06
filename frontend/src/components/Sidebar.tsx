@@ -1,22 +1,72 @@
 import React from 'react';
-import { Entity } from '../types/entity';
-import { MapPin, Info, Edit, Trash2 } from 'lucide-react';
+import { Entity, EntityPayload } from '../types/entity';
+import { MapPin, Info, Edit, Trash2, Plus, X } from 'lucide-react';
+import EntityForm from './EntityForm';
+import { useCreateEntity } from '../hooks/useEntities';
 
 interface SidebarProps {
   entities: Entity[];
-  onSelect: (entity: Entity) => void;
+  onSelect: (entity: Entity | null) => void;
   selectedEntity: Entity | null;
+  isAdding: boolean;
+  setIsAdding: (adding: boolean) => void;
+  tempLocation: { lat: number; lng: number } | null;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ entities, onSelect, selectedEntity }) => {
+const Sidebar: React.FC<SidebarProps> = ({ 
+  entities, onSelect, selectedEntity, isAdding, setIsAdding, tempLocation 
+}) => {
+  const createMutation = useCreateEntity();
+
+  const handleAddSubmit = (data: EntityPayload) => {
+    createMutation.mutate(data, {
+      onSuccess: () => {
+        setIsAdding(false);
+      }
+    });
+  };
+
+  if (isAdding) {
+    return (
+      <div className="w-80 h-full bg-white border-r border-gray-200 flex flex-col z-20 shadow-lg">
+        <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-50">
+          <h2 className="font-bold text-blue-800">Tambah Entitas Baru</h2>
+          <button onClick={() => setIsAdding(false)} className="text-gray-500 hover:text-gray-700">
+            <X size={20} />
+          </button>
+        </div>
+        <EntityForm 
+          initialLocation={tempLocation} 
+          onSubmit={handleAddSubmit} 
+          onCancel={() => setIsAdding(false)} 
+          isLoading={createMutation.isPending}
+        />
+        {createMutation.isError && (
+          <div className="p-2 bg-red-100 text-red-700 text-xs text-center border-t border-red-200">
+            {(createMutation.error as any)?.message || 'Gagal menyimpan entitas'}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="w-80 h-full bg-white border-r border-gray-200 flex flex-col z-20 shadow-lg">
-      <div className="p-4 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-          <MapPin className="text-blue-500" />
-          Geo Entities
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">Daftar entitas geografis</p>
+      <div className="p-4 border-b border-gray-200 flex justify-between items-start">
+        <div>
+          <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <MapPin className="text-blue-500" />
+            Geo Entities
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Daftar entitas geografis</p>
+        </div>
+        <button 
+          onClick={() => { setIsAdding(true); onSelect(null); }}
+          className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow-sm"
+          title="Tambah Entitas"
+        >
+          <Plus size={20} />
+        </button>
       </div>
       
       <div className="flex-1 overflow-y-auto p-2">
@@ -54,8 +104,14 @@ const Sidebar: React.FC<SidebarProps> = ({ entities, onSelect, selectedEntity })
       </div>
 
       {selectedEntity && (
-        <div className="border-t border-gray-200 p-4 bg-gray-50 flex flex-col h-1/3">
-          <div className="flex justify-between items-center mb-3">
+        <div className="border-t border-gray-200 p-4 bg-gray-50 flex flex-col h-1/3 relative">
+          <button 
+            className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+            onClick={() => onSelect(null)}
+          >
+            <X size={16} />
+          </button>
+          <div className="flex justify-between items-center mb-3 mt-2">
             <h3 className="font-bold text-gray-800 flex items-center gap-1.5">
               <Info size={16} /> Detail
             </h3>

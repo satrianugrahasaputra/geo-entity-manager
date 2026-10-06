@@ -11,8 +11,15 @@ const queryClient = new QueryClient();
 const AppContent: React.FC = () => {
   const { data, isLoading, isError, error } = useEntities();
   const [selectedEntity, setSelectedEntity] = useState<Entity | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [tempLocation, setTempLocation] = useState<{lat: number; lng: number} | null>(null);
 
   const entities = data?.data || [];
+
+  // Reset temp location when adding is cancelled
+  React.useEffect(() => {
+    if (!isAdding) setTempLocation(null);
+  }, [isAdding]);
 
   return (
     <div className="w-full h-screen flex overflow-hidden">
@@ -21,12 +28,20 @@ const AppContent: React.FC = () => {
         entities={entities} 
         onSelect={setSelectedEntity} 
         selectedEntity={selectedEntity} 
+        isAdding={isAdding}
+        setIsAdding={setIsAdding}
+        tempLocation={tempLocation}
       />
 
       {/* Main Map Area */}
       <div className="flex-1 relative">
         <div className="absolute inset-0 z-0">
-          <Map entities={entities} />
+          <Map 
+            entities={entities} 
+            isAdding={isAdding}
+            tempLocation={tempLocation}
+            onLocationSelect={setTempLocation}
+          />
         </div>
 
         {/* Overlays for loading and error */}
