@@ -9,8 +9,9 @@ import (
 
 // RouterConfig holds what the router needs to build the middleware chain.
 type RouterConfig struct {
-	Logger      *slog.Logger
-	CORSOrigins []string
+	Logger        *slog.Logger
+	CORSOrigins   []string
+	EntityHandler *EntityHandler
 }
 
 // NewRouter builds the Gin engine with middleware and routes.
@@ -33,6 +34,11 @@ func NewRouter(cfg RouterConfig) *gin.Engine {
 	r.GET("/healthz", Health)
 	api := r.Group("/api/v1")
 	api.GET("/healthz", Health)
+	
+	if cfg.EntityHandler != nil {
+		api.POST("/entities", cfg.EntityHandler.Create)
+		api.GET("/entities/:id", cfg.EntityHandler.GetByID)
+	}
 
 	r.NoRoute(func(c *gin.Context) {
 		abortWithError(c, http.StatusNotFound, CodeNotFound, "Resource tidak ditemukan", nil)
