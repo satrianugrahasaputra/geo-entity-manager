@@ -3,10 +3,10 @@ package validation
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"geo-entity-manager/backend/internal/apperror"
 	"geo-entity-manager/backend/internal/model"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // testStruct is used to test the rules without relying entirely on the DTO.
@@ -39,12 +39,16 @@ func TestValidation(t *testing.T) {
 		{"name too short", func(s *testStruct) { s.Name = "ab" }, []string{"name"}},
 		{"name 100 chars ok", func(s *testStruct) {
 			b := make([]byte, 100)
-			for i := range b { b[i] = 'a' }
+			for i := range b {
+				b[i] = 'a'
+			}
 			s.Name = string(b)
 		}, nil},
 		{"name too long", func(s *testStruct) {
 			b := make([]byte, 101)
-			for i := range b { b[i] = 'a' }
+			for i := range b {
+				b[i] = 'a'
+			}
 			s.Name = string(b)
 		}, []string{"name"}},
 		{"type invalid", func(s *testStruct) { s.Type = "unknown" }, []string{"type"}},
@@ -62,7 +66,7 @@ func TestValidation(t *testing.T) {
 				require.Error(t, err)
 				valErr, ok := err.(*apperror.ValidationError)
 				require.True(t, ok, "expected ValidationError")
-				
+
 				var gotFields []string
 				for _, d := range valErr.Details {
 					gotFields = append(gotFields, d.Field)

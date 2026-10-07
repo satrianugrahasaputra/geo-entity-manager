@@ -19,6 +19,8 @@ import (
 
 	"geo-entity-manager/backend/internal/config"
 	"geo-entity-manager/backend/internal/handler"
+	"geo-entity-manager/backend/internal/repository"
+	"geo-entity-manager/backend/internal/service"
 )
 
 func main() {
@@ -41,10 +43,31 @@ func run(ctx context.Context, logOut io.Writer) error {
 	log := slog.New(slog.NewJSONHandler(logOut, &slog.HandlerOptions{Level: cfg.LogLevel}))
 	slog.SetDefault(log)
 
+	if cfg.DatabaseURL == "" {
+		return errors.New("DATABASE_URL is required")
+	}
+
+	if err := repository.Migrate(cfg.DatabaseURL); err != nil {
+		return fmt.Errorf("run migrations: %w", err)
+	}
+
+	connectCtx, cancelConnect := context.WithTimeout(ctx, 15*time.Second)
+	pool, err := repository.ConnectDB(connectCtx, cfg.DatabaseURL)
+	cancelConnect()
+	if err != nil {
+		return fmt.Errorf("connect database: %w", err)
+	}
+	defer pool.Close()
+
+	entityRepo := repository.NewEntityRepository(pool)
+	entitySvc := service.NewEntityService(entityRepo)
+	entityHandler := handler.NewEntityHandler(entitySvc)
+
 	gin.SetMode(gin.ReleaseMode)
 	router := handler.NewRouter(handler.RouterConfig{
-		Logger:      log,
-		CORSOrigins: cfg.CORSOrigins,
+		Logger:        log,
+		CORSOrigins:   cfg.CORSOrigins,
+		EntityHandler: entityHandler,
 	})
 
 	srv := &http.Server{

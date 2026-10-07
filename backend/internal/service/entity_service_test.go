@@ -52,7 +52,7 @@ func TestCreate(t *testing.T) {
 
 	t.Run("trims name", func(t *testing.T) {
 		e := &model.Entity{Name: "  Pajero Sport  "}
-		
+
 		var savedName string
 		fakeRepo.createFunc = func(ctx context.Context, entity *model.Entity) error {
 			savedName = entity.Name

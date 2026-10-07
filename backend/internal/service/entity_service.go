@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/google/uuid"
 	"geo-entity-manager/backend/internal/model"
+	"github.com/google/uuid"
 )
 
 // EntityRepository defines the expected database operations.

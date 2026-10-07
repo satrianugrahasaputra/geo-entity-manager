@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log/slog"
 
+	"geo-entity-manager/backend/migrations"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
-	"geo-entity-manager/backend/migrations"
 )
 
 // Migrate runs the embedded migrations against the given database URL.
@@ -22,8 +22,7 @@ func Migrate(databaseURL string) error {
 	if err != nil {
 		return fmt.Errorf("init migration: %w", err)
 	}
-	defer m.Close()
-	defer m.Close()
+	defer func() { _, _ = m.Close() }()
 
 	slog.Info("running database migrations...")
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {

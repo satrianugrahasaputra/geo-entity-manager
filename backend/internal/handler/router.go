@@ -34,7 +34,7 @@ func NewRouter(cfg RouterConfig) *gin.Engine {
 	r.GET("/healthz", Health)
 	api := r.Group("/api/v1")
 	api.GET("/healthz", Health)
-	
+
 	if cfg.EntityHandler != nil {
 		api.POST("/entities", cfg.EntityHandler.Create)
 		api.GET("/entities", cfg.EntityHandler.List)

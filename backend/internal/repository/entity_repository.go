@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/google/uuid"
 
 	"geo-entity-manager/backend/internal/apperror"
 	"geo-entity-manager/backend/internal/model"
@@ -30,7 +30,7 @@ func (r *EntityRepository) Create(ctx context.Context, e *model.Entity) error {
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id, created_at, updated_at
 	`
-	
+
 	err := r.pool.QueryRow(ctx, query,
 		e.Name,
 		e.Type,
@@ -54,7 +54,7 @@ func (r *EntityRepository) GetByID(ctx context.Context, id uuid.UUID) (*model.En
 		FROM entities
 		WHERE id = $1
 	`
-	
+
 	e := &model.Entity{}
 	err := r.pool.QueryRow(ctx, query, id).Scan(
 		&e.ID,
@@ -127,7 +127,7 @@ func (r *EntityRepository) Count(ctx context.Context, typeFilter *model.EntityTy
 func (r *EntityRepository) List(ctx context.Context, typeFilter *model.EntityType, statusFilter *model.EntityStatus, search *string, limit, offset int) ([]model.Entity, error) {
 	where, args := buildListQuery(typeFilter, statusFilter, search)
 	argID := len(args) + 1
-	
+
 	query := fmt.Sprintf(`
 		SELECT id, name, type, status, description, latitude, longitude, created_at, updated_at
 		FROM entities
@@ -135,7 +135,7 @@ func (r *EntityRepository) List(ctx context.Context, typeFilter *model.EntityTyp
 		ORDER BY created_at DESC
 		LIMIT $%d OFFSET $%d
 	`, where, argID, argID+1)
-	
+
 	args = append(args, limit, offset)
 
 	rows, err := r.pool.Query(ctx, query, args...)
@@ -196,4 +196,3 @@ func (r *EntityRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	}
 	return nil
 }
-

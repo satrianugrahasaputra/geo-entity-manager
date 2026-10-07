@@ -38,6 +38,7 @@ func TestLoadFrom(t *testing.T) {
 			name: "all values overridden",
 			env: map[string]string{
 				"HTTP_PORT":        "9090",
+				"DATABASE_URL":     " postgres://u:p@h:5432/d ",
 				"CORS_ORIGINS":     " http://a.test , ,http://b.test ",
 				"LOG_LEVEL":        "debug",
 				"SEED_DATA":        "true",
@@ -45,6 +46,7 @@ func TestLoadFrom(t *testing.T) {
 			},
 			want: Config{
 				HTTPPort:        9090,
+				DatabaseURL:     "postgres://u:p@h:5432/d",
 				CORSOrigins:     []string{"http://a.test", "http://b.test"},
 				LogLevel:        slog.LevelDebug,
 				SeedData:        true,

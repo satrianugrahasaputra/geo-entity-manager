@@ -78,7 +78,7 @@ func (h *EntityHandler) GetByID(c *gin.Context) {
 // List handles GET /entities
 func (h *EntityHandler) List(c *gin.Context) {
 	var query ListEntityQuery
-	
+
 	// Bind valid query params
 	if err := c.ShouldBindQuery(&query); err != nil {
 		// Just a basic mapping for gin's binder errors; strict validation happens next
@@ -209,4 +209,3 @@ func (h *EntityHandler) Delete(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
-

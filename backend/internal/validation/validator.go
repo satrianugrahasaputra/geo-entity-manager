@@ -6,20 +6,20 @@ import (
 	"math"
 	"strings"
 
-	"github.com/go-playground/validator/v10"
 	"geo-entity-manager/backend/internal/apperror"
+	"github.com/go-playground/validator/v10"
 )
 
 var validate *validator.Validate
 
 func init() {
 	validate = validator.New(validator.WithRequiredStructEnabled())
-	
+
 	// Register custom validations
 	_ = validate.RegisterValidation("notblank", func(fl validator.FieldLevel) bool {
 		return strings.TrimSpace(fl.Field().String()) != ""
 	})
-	
+
 	_ = validate.RegisterValidation("finite", func(fl validator.FieldLevel) bool {
 		val := fl.Field().Float()
 		return !math.IsNaN(val) && !math.IsInf(val, 0)

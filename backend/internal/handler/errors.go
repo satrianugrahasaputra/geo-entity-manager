@@ -4,8 +4,8 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"geo-entity-manager/backend/internal/apperror"
+	"github.com/gin-gonic/gin"
 )
 
 // HandleError maps domain and application errors to the uniform HTTP error response.
@@ -33,7 +33,7 @@ func HandleError(c *gin.Context, err error) {
 		// Wait, PRD says "400 JSON rusak". The decoder returns 400 for parsing errors?
 		// Currently decoder returns ValidationError (which maps to 422).
 		// Let's distinguish Syntax errors. If it's a syntax error, we want 400.
-		
+
 		if err.Error() == "json parse error: EOF" || err.Error() == "Body JSON kosong" || err.Error() == "Format JSON tidak valid" {
 			abortWithError(c, http.StatusBadRequest, CodeBadRequest, "Format JSON tidak valid", nil)
 		} else {

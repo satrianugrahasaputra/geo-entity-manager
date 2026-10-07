@@ -3,8 +3,8 @@ package handler
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"geo-entity-manager/backend/internal/model"
+	"github.com/google/uuid"
 )
 
 // CreateEntityRequest is the payload for POST /entities

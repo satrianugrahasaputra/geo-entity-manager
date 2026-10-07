@@ -18,7 +18,7 @@ export const entitySchema = z.object({
 
 // Skema payload untuk Create dan Update
 export const entityPayloadSchema = z.object({
-  name: z.string().min(3, 'Minimal 3 karakter').max(100, 'Maksimal 100 karakter'),
+  name: z.string().trim().min(3, 'Minimal 3 karakter').max(100, 'Maksimal 100 karakter'),
   type: entityTypeSchema,
   status: entityStatusSchema,
   description: z.string().max(500, 'Maksimal 500 karakter').optional(),

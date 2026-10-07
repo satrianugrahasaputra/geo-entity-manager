@@ -156,4 +156,3 @@ func TestListEntities(t *testing.T) {
 		assert.Equal(t, CodeValidation, resp.Error.Code)
 	})
 }
-

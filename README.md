@@ -6,7 +6,7 @@ Aplikasi web untuk menampilkan dan mengelola *entity* berlokasi geografis (kenda
 
 | Area | Teknologi |
 | --- | --- |
-| Frontend | React 18 + TypeScript + Vite, react-leaflet (OpenStreetMap), TanStack Query, React Hook Form + Zod, Tailwind CSS |
+| Frontend | React 19 + TypeScript + Vite, react-leaflet (OpenStreetMap), TanStack Query, React Hook Form + Zod, Tailwind CSS, Vitest |
 | Backend | Go + Gin, go-playground/validator, pgx, golang-migrate, `log/slog` |
 | Database | PostgreSQL 16 |
 | Infra lokal | Docker Compose |
@@ -17,14 +17,39 @@ Syarat: Docker & Docker Compose sudah terpasang.
 
 1. Jalankan semua service (DB, API, Web):
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
-2. Aplikasi Web dapat diakses di: `http://localhost:80` (atau port yang dipetakan oleh Docker).
-3. Backend API dapat diakses di: `http://localhost:8080/api/v1`
+   Saat start, API otomatis menjalankan migrasi (termasuk data contoh) lalu terhubung ke Postgres.
+2. Aplikasi Web: `http://localhost`
+3. Backend API langsung: `http://localhost:8080/api/v1` (health check: `/healthz`)
 
-**Untuk Pengembangan Lokal (tanpa Docker):**
-- **Backend**: `cd backend && go run ./cmd/server` (pastikan env `DATABASE_URL` sudah mengarah ke Postgres aktif)
-- **Frontend**: `cd frontend && npm install && npm run dev`
+### Arsitektur koneksi FE → API
+
+Frontend memanggil API lewat path relatif **`/api/v1`** (same-origin), sehingga tidak bergantung pada CORS:
+
+- **Docker**: Nginx di container `web` ([frontend/nginx.conf](./frontend/nginx.conf)) meneruskan `/api/` ke `api:8080`.
+- **Dev lokal**: Vite dev server mem-proxy `/api` ke `http://localhost:8080` ([frontend/vite.config.ts](./frontend/vite.config.ts)).
+- Bila API berada di origin lain, set `VITE_API_URL` saat build dan tambahkan origin FE ke `CORS_ORIGINS` di backend.
+
+### Pengembangan Lokal (tanpa Docker untuk app)
+
+```bash
+docker compose up -d db                       # hanya Postgres
+cd backend
+$env:DATABASE_URL="postgres://geo:change-me@localhost:5432/geo_entities?sslmode=disable"  # PowerShell
+go run ./cmd/server
+
+cd frontend && npm install && npm run dev     # http://localhost:5173
+```
+
+Variabel env backend: `DATABASE_URL` (wajib), `HTTP_PORT` (default 8080), `CORS_ORIGINS`, `LOG_LEVEL`, `SHUTDOWN_TIMEOUT`. Contoh ada di [.env.example](./.env.example).
+
+### Test, Lint, Typecheck
+
+```bash
+cd backend && go test ./... && golangci-lint run
+cd frontend && npm test && npm run lint && npm run typecheck
+```
 
 ## Alasan Pemilihan Library
 
@@ -33,6 +58,8 @@ Syarat: Docker & Docker Compose sudah terpasang.
 - **Zod + React Hook Form**: Integrasi mulus untuk validasi skema yang ketat dan efisien (menghindari render berulang).
 - **TanStack Query**: Manajemen state server-side yang andal (caching, loading, error handling out of the box).
 - **Leaflet (react-leaflet)**: Alternatif open-source ringan untuk Mapbox/Google Maps.
+- **Vitest**: Satu konfigurasi dengan Vite, API kompatibel Jest, cepat untuk test skema/komponen.
+- **Nginx (container web)**: Menyajikan build SPA sekaligus reverse proxy `/api` agar FE dan API satu origin.
 
 ## Workflow Penggunaan Agentic AI
 
@@ -40,7 +67,14 @@ Aplikasi ini dikembangkan menggunakan Agentic AI (Antigravity). AI memandu prose
 - **Perencanaan (Manual + AI)**: Rencana di-breakdown jadi 18 slice.
 - **Backend (AI)**: AI menyusun skema, migration, routing, repository, serta testing per fungsi dengan panduan konvensi Clean Architecture sederhana.
 - **Frontend (AI)**: Scaffold via Vite CLI otomatis oleh agen, penulisan React Component, custom hooks (TanStack), mapping Leaflet.
-- **Verifikasi**: AI otomatis menjalankan `go test` dan `tsc` sebelum commit untuk memastikan *type-safety* dan lolos tes.
+- **Verifikasi**: AI menjalankan `go test`, `tsc`, dan `vitest` setelah perubahan.
+- **Review & debugging manual (User)**: Pengguna menjalankan `docker compose up --build` dan menguji aplikasi di browser. Dari pengujian manual ini ditemukan bahwa data tidak tampil; AI lalu menelusuri dan memperbaiki penyebabnya:
+  - `cmd/server/main.go` belum menyambungkan DB, migrasi, dan route `/api/v1/entities` (sebelumnya hanya health check aktif).
+  - Request FE dari `http://localhost` diblokir CORS → diganti pola proxy same-origin (Nginx/Vite).
+  - Env `PORT` di compose diganti `HTTP_PORT` sesuai config backend.
+  - Skema Zod `name` belum di-trim seperti backend → diperbaiki dan dikunci dengan test.
+
+> Catatan jujur: tabel progres di bawah sempat ditandai selesai sebelum aplikasi diuji end-to-end. Masalah di atas baru terdeteksi saat pengujian manual, sehingga verifikasi via Docker oleh manusia tetap diperlukan.
 
 ## Progres per Slice
 
@@ -68,6 +102,9 @@ Aplikasi ini dikembangkan menggunakan Agentic AI (Antigravity). AI memandu prose
 
 ## Fitur Belum Selesai & Batasan yang Diketahui
 
-- Tes otomatis (Unit/Integration test) untuk **Frontend** dengan Vitest belum ditulis.
-- Pagination di sisi Frontend belum sepenuhnya menggunakan tombol page/infinite scroll (hanya menampilkan data berdasarkan limit dari backend yang dikonfigurasi ke 5000 max).
+- Test **Frontend** baru mencakup skema Zod (`src/schemas/entity.test.ts`); test komponen (Map, Sidebar, EntityForm) dengan Testing Library belum ditulis.
+- Test integrasi repository Postgres hanya berjalan bila `TEST_DATABASE_URL` di-set (di-skip jika tidak).
+- Data contoh dimasukkan lewat migrasi `000002_seed_data`, sehingga selalu ikut ter-apply; env `SEED_DATA` saat ini belum berpengaruh.
+- Pagination di sisi Frontend belum memakai tombol page/infinite scroll (mengambil semua data, hard cap 5000 dari backend).
+- `npm run lint` masih memberi 2 warning React (`setState` di dalam effect) yang belum di-refactor.
 - Di luar scope sesuai PRD: autentikasi, pelacakan real-time, riwayat lokasi, filter bounding box, dark mode.

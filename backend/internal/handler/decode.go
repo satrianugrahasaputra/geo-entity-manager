@@ -68,7 +68,7 @@ func DecodeAndValidate(r *http.Request, v interface{}) error {
 func DecodeQueryAndValidate(r *http.Request, v interface{}) error {
 	// For strict query validation, we could check for unknown params here.
 	// But using a simple generic form binder from gorilla/schema or similar is often easier.
-	// Since we don't have it, we'll manually check unknown keys if needed, 
+	// Since we don't have it, we'll manually check unknown keys if needed,
 	// or let the framework binder do it. Let's do a simple check.
 	allowedKeys := map[string]bool{
 		"type": true, "status": true, "search": true, "page": true, "limit": true,
@@ -86,4 +86,3 @@ func DecodeQueryAndValidate(r *http.Request, v interface{}) error {
 	// Actually we should just pass the struct to validation.Struct.
 	return validation.Struct(v)
 }
-

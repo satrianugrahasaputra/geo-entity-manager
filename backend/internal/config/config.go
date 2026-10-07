@@ -14,6 +14,7 @@ import (
 // Config holds all runtime settings for the API server.
 type Config struct {
 	HTTPPort        int
+	DatabaseURL     string
 	CORSOrigins     []string
 	LogLevel        slog.Level
 	SeedData        bool
@@ -48,6 +49,10 @@ func LoadFrom(lookup LookupFunc) (Config, error) {
 		} else {
 			cfg.HTTPPort = port
 		}
+	}
+
+	if v, ok := nonEmpty(lookup, "DATABASE_URL"); ok {
+		cfg.DatabaseURL = v
 	}
 
 	if v, ok := lookup("CORS_ORIGINS"); ok {
